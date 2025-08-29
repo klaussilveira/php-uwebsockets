@@ -2,8 +2,8 @@
 CPP          = g++
 CC           = cc
 AR           = ar rcs
-CFLAGS       = -O3 -fPIC -g -DLIBUS_USE_IO_URING -DLIBUS_USE_ASIO
-CPPFLAGS     = -Wall -O2 -fPIC -std=c++17 -pthread -DLIBUS_USE_ASIO
+CFLAGS       = -O3 -fPIC -g
+CPPFLAGS     = -fPIC -flto=auto -march=native -O3 -Wpedantic -Wall -Wextra -Wsign-conversion -Wconversion -std=c++2b -Isrc
 LDFLAGS      = -shared
 
 # PHP configuration
@@ -34,10 +34,7 @@ USOCKETS_C_SOURCES = \
 	$(USOCKETS_SRC)/eventing/epoll_kqueue.c \
 	$(USOCKETS_SRC)/eventing/gcd.c \
 	$(USOCKETS_SRC)/eventing/libuv.c \
-	$(USOCKETS_SRC)/crypto/openssl.c \
-	$(USOCKETS_SRC)/io_uring/io_context.c \
-	$(USOCKETS_SRC)/io_uring/io_loop.c \
-	$(USOCKETS_SRC)/io_uring/io_socket.c
+	$(USOCKETS_SRC)/crypto/openssl.c
 
 USOCKETS_OBJECTS = $(USOCKETS_C_SOURCES:.c=.o)
 
@@ -46,7 +43,7 @@ USOCKETS_OBJECTS = $(USOCKETS_C_SOURCES:.c=.o)
 all: $(EXT_SO)
 
 $(EXT_SO): $(CPP_OBJECTS) libusockets.a
-	$(CPP) $(LDFLAGS) -o $@ $(CPP_OBJECTS) libusockets.a -lphpcpp -luring -lssl -lcrypto -lz -lstdc++ -lpthread
+	$(CPP) $(LDFLAGS) -o $@ $(CPP_OBJECTS) libusockets.a -lphpcpp -lssl -lcrypto -lz -lstdc++
 
 %.o: %.cpp
 	$(CPP) $(CPPFLAGS) -I$(UWS_SRC) -I$(USOCKETS_SRC) $(PHP_INCLUDE) -c $< -o $@
